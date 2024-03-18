@@ -1,0 +1,9 @@
+/.idea
+*.sw[pqo]
+main
+/tmp
+local
+.vscode
+/gen
+bin/
+*.bak
