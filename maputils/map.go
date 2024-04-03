@@ -70,6 +70,26 @@ func FilterByValue[M ~map[K]V, K comparable, V any](m M, matcher matcher.Matcher
 	return r
 }
 
+func FilterValues[M ~map[K]V, K comparable, V any](m M, matcher matcher.Matcher[V]) []V {
+	var r []V
+	for _, v := range m {
+		if matcher(v) {
+			r = append(r, v)
+		}
+	}
+	return r
+}
+
+func FilterKeys[M ~map[K]V, K comparable, V any](m M, matcher matcher.Matcher[K]) []V {
+	var r []V
+	for k, v := range m {
+		if matcher(k) {
+			r = append(r, v)
+		}
+	}
+	return r
+}
+
 type Transformer[K, V, TK, TV any] func(K, V) (TK, TV)
 
 func KeyValueTransformer[K, V, TK, TV any](tk transformer.Transformer[K, TK], tv transformer.Transformer[V, TV]) Transformer[K, V, TK, TV] {

@@ -1,81 +1,69 @@
-// //nolint: errorlint // this is the new As method, also handling error lists
 package errors
 
 import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/mandelsoft/goutils/generics"
 )
 
 var (
 	New    = errors.New
 	Unwrap = errors.Unwrap
+	As     = errors.As
+	Is     = errors.Is
 )
+
+type unwrapList interface {
+	Unwrap() []error
+}
 
 func Newf(msg string, args ...interface{}) error {
 	return New(fmt.Sprintf(msg, args...))
 }
 
-func As(err error, target any) bool {
-	if errors.As(err, target) {
-		return true
-	}
-
-	for err != nil {
-		if list, ok := err.(*ErrorList); ok {
-			for _, n := range list.errors {
-				if As(n, target) {
-					return true
-				}
-			}
-		}
-		err = Unwrap(err)
-	}
-	return false
-}
-
-// Is checks for a concrete error object
-// along the error chain.
-func Is(err error, target error) bool {
-	if target == nil || err == nil {
-		return err == target
-	}
-
-	if errors.Is(err, target) {
-		return true
-	}
-
-	for err != nil {
-		if list, ok := err.(*ErrorList); ok {
-			for _, n := range list.errors {
-				if Is(n, target) {
-					return true
-				}
-			}
-		}
-		err = Unwrap(err)
-	}
-	return false
-}
-
 // IsA checks for an error of a dedicated type
 // along the error chain.
 func IsA(err error, target error) bool {
-	if target == nil {
+	if target == nil || err == target {
 		return err == target
 	}
 	if err == nil {
 		return false
 	}
-	typ := reflect.TypeOf(target)
+	return isA(err, reflect.TypeOf(target))
+}
 
+func IsOfType[T error](err error) bool {
+	if err == nil {
+		return false
+	}
+	return isA(err, generics.TypeOf[T]())
+}
+
+func isA(err error, typ reflect.Type) bool {
+	ptyp := typ
+	if typ.Kind() == reflect.Struct {
+		ptyp = reflect.PointerTo(typ)
+	}
+	if typ.Kind() == reflect.Pointer {
+		typ = typ.Elem()
+	}
+	return _isA(err, typ, ptyp)
+}
+
+func _isA(err error, typ, ptyp reflect.Type) bool {
 	for err != nil {
 		if reflect.TypeOf(err).AssignableTo(typ) {
 			return true
 		}
-		if list, ok := err.(*ErrorList); ok {
-			for _, n := range list.errors {
-				if IsA(n, target) {
+		if reflect.TypeOf(err).AssignableTo(ptyp) {
+			return true
+		}
+		if list, ok := err.(unwrapList); ok {
+			for _, n := range list.Unwrap() {
+				if _isA(n, typ, ptyp) {
 					return true
 				}
 			}
@@ -106,6 +94,9 @@ func NewEf(cause error, msg string, args ...interface{}) error {
 	}
 }
 
+// Wrapf wraps an occurred error with a context message.
+// If no error is given, no error is returned.
+// The error context is formatted with [fmt.Sprintf].
 func Wrapf(err error, msg string, args ...interface{}) error {
 	if err == nil || msg == "" {
 		return err
@@ -119,6 +110,8 @@ func Wrapf(err error, msg string, args ...interface{}) error {
 	}
 }
 
+// Wrap wraps an occurred error with a context message.
+// If no error is given, no error is returned.
 func Wrap(err error, args ...interface{}) error {
 	if err == nil || len(args) == 0 {
 		return err
