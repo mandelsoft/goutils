@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-
-	"github.com/mandelsoft/goutils/generics"
 )
 
 var (
@@ -39,7 +37,7 @@ func IsOfType[T error](err error) bool {
 	if err == nil {
 		return false
 	}
-	return isA(err, generics.TypeOf[T]())
+	return isA(err, typeOf[T]())
 }
 
 func isA(err error, typ reflect.Type) bool {
@@ -108,6 +106,13 @@ func Wrapf(err error, msg string, args ...interface{}) error {
 		wrapped: err,
 		msg:     msg,
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+func typeOf[T any]() reflect.Type {
+	var t T
+	return reflect.TypeOf(&t).Elem()
 }
 
 // Wrap wraps an occurred error with a context message.
