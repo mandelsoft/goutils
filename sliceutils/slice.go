@@ -7,6 +7,13 @@ import (
 	"github.com/mandelsoft/goutils/matcher"
 )
 
+// Appended returns a new slice containing the additional elements appended to
+// to the original slice.
+func Appended[E any](slice []E, elems ...E) []E {
+	return append(slices.Clone(slice), elems...)
+}
+
+// AppendUnique appends elements to a slice, if they are not net contained.
 func AppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 	for _, v := range add {
 		if !slices.Contains(in, v) {
@@ -16,7 +23,33 @@ func AppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 	return in
 }
 
+// AppendedUnique returns a new slice with additional elements appended,
+// if they are not net contained.
+func AppendedUnique[S ~[]E, E comparable](in S, add ...E) S {
+	in = slices.Clone(in)
+	for _, v := range add {
+		if !slices.Contains(in, v) {
+			in = append(in, v)
+		}
+	}
+	return in
+}
+
+// AppendUniqueFunc returns appends additional elements,
+// if they are considered by the given function not to be yet present.
 func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) S {
+	for _, v := range add {
+		if !slices.ContainsFunc(in, func(e E) bool { return cmp(v, e) == 0 }) {
+			in = append(in, v)
+		}
+	}
+	return in
+}
+
+// AppendedUniqueFunc returns a new slice with additional elements appended,
+// if they are considered by the given function not to be yet present.
+func AppendedUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) S {
+	in = slices.Clone(in)
 	for _, v := range add {
 		if !slices.ContainsFunc(in, func(e E) bool { return cmp(v, e) == 0 }) {
 			in = append(in, v)
