@@ -31,6 +31,20 @@ func OptionalDefaulted[T any](def T, args ...T) T {
 	return def
 }
 
+// OptionalDefaultedBool checks all args for true. If no args are given
+// the given default is returned.
+func OptionalDefaultedBool(def bool, list ...bool) bool {
+	if len(list) == 0 {
+		return def
+	}
+	for _, e := range list {
+		if e {
+			return e
+		}
+	}
+	return false
+}
+
 func HashData(d interface{}) string {
 	if reflect2.IsNil(d) {
 		return ""

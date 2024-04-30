@@ -8,18 +8,25 @@ import (
 
 // TryCast is like Cast, but reports
 // whether the assertion is possible or not.
-func TryCast[T, O any](o O) (T, bool) {
+func TryCast[T any](o any) (T, bool) {
+	var _nil T
+	if o == nil {
+		return _nil, true
+	}
 	var i any = o
 	t, ok := i.(T)
 	return t, ok
 }
 
 // TryCastE casts one type parameter to another type parameter,
-// which have a sub type relation.
+// which have a subtype relation.
 // This cannot be described by type parameter constraints in Go, because
 // constraints may not be type parameters again.
-func TryCastE[T any, O any](o O) (T, error) {
+func TryCastE[T any](o any) (T, error) {
 	var _nil T
+	if o == nil {
+		return _nil, nil
+	}
 	var s any = o
 	if t, ok := s.(T); ok {
 		return t, nil
@@ -33,7 +40,11 @@ func TryCastE[T any, O any](o O) (T, error) {
 //	func [O any](...) {
 //	   x := i.(O)
 //	}
-func Cast[T, O any](o O) T {
+func Cast[T any](o any) T {
+	var _nil T
+	if o == nil {
+		return _nil
+	}
 	var i any = o
 	t := i.(T)
 	return t
@@ -49,4 +60,17 @@ func CastPointer[I any, E any, P PointerType[E]](e P) I {
 	}
 	var i any = e
 	return i.(I)
+}
+
+// CastPointerR maps a pointer P to an interface type I
+// for a factory function with an additional error result
+// avoiding typed nil pointers. Nil pointers will be mapped
+// to nil interfaces.
+func CastPointerR[I any, E any, P PointerType[E]](e P, err error) (I, error) {
+	var _nil I
+	if e == nil || err != nil {
+		return _nil, err
+	}
+	var i any = e
+	return i.(I), nil
 }

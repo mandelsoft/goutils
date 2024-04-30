@@ -13,7 +13,7 @@ type CompareFunc[E any] func(a, b E) int
 
 // Keys provides a list of keys optionally sorted
 // by a CompareFunc.
-func Keys[M ~map[K]V, K comparable, V any](m M, cmp ...func(a, b K) int) []K {
+func Keys[M ~map[K]V, K comparable, V any](m M, cmp ...CompareFunc[K]) []K {
 	r := []K{}
 
 	for k := range m {
@@ -26,7 +26,7 @@ func Keys[M ~map[K]V, K comparable, V any](m M, cmp ...func(a, b K) int) []K {
 }
 
 // Values returns values optionally ordered by keys.
-func Values[M ~map[K]V, K comparable, V any](m M, cmp ...func(a, b K) int) []V {
+func Values[M ~map[K]V, K comparable, V any](m M, cmp ...CompareFunc[K]) []V {
 	return sliceutils.Transform(Keys(m, cmp...), func(k K) V {
 		return m[k]
 	})
