@@ -100,3 +100,13 @@ func DescribeObject(o any) string {
 	}
 	return "<no description>"
 }
+
+// Conditional is the tenary operator, BUT
+// there is no conditional/lazy evaluation
+// of the cases, because they are handled as arguments.
+func Conditional[T any](cond bool, a, b T) T {
+	if cond {
+		return a
+	}
+	return b
+}

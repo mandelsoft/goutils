@@ -50,6 +50,22 @@ func Cast[T any](o any) T {
 	return t
 }
 
+// CastR cast a result type to a dedicated Type T
+// for a factory function with an additional error result
+// Nil will be mapped to the initial value of the target type
+func CastR[T any](o any, err error) (T, error) {
+	var _nil T
+	if o == nil {
+		return _nil, err
+	}
+
+	var s any = o
+	if t, ok := s.(T); ok {
+		return t, err
+	}
+	return _nil, errors.ErrInvalid("type", fmt.Sprintf("%T", o))
+}
+
 // CastPointer maps a pointer P to an interface type I
 // avoiding typed nil pointers. Nil pointers will be mapped
 // to nil interfaces.

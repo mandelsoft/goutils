@@ -7,9 +7,9 @@ import (
 	"github.com/mandelsoft/goutils/matcher"
 )
 
-// Appended returns a new slice containing the additional elements appended to
+// CopyAppend returns a new slice containing the additional elements appended to
 // to the original slice.
-func Appended[E any](slice []E, elems ...E) []E {
+func CopyAppend[E any](slice []E, elems ...E) []E {
 	return append(slices.Clone(slice), elems...)
 }
 
@@ -96,6 +96,23 @@ func ConvertPointer[T any, S ~[]P, E any, P generics.PointerType[E]](s S) []T {
 		}
 	}
 	return t
+}
+
+// ConvertWith converts the element type of a slice
+// using a converter function.
+// Unfortunately this cannot be expressed in a type-safe way in Go.
+// I MUST follow the type constraint I super S, which cannot be expressed in Go.
+// If I == S the Transform function should be used, instead.
+func ConvertWith[S, T, I any](in []S, c func(I) T) []T {
+	if in == nil {
+		return nil
+	}
+	r := make([]T, len(in))
+	for i := range in {
+		var s any = in[i]
+		r[i] = c(generics.Cast[I](s))
+	}
+	return r
 }
 
 // Filter filters a slice by a matcher.Matcher.
