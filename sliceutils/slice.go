@@ -23,9 +23,9 @@ func AppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 	return in
 }
 
-// AppendedUnique returns a new slice with additional elements appended,
+// CopyAppendUnique returns a new slice with additional elements appended,
 // if they are not net contained.
-func AppendedUnique[S ~[]E, E comparable](in S, add ...E) S {
+func CopyAppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 	in = slices.Clone(in)
 	for _, v := range add {
 		if !slices.Contains(in, v) {
@@ -46,12 +46,12 @@ func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) 
 	return in
 }
 
-// AppendedUniqueFunc returns a new slice with additional elements appended,
+// CopyAppendUniqueFunc returns a new slice with additional elements appended,
 // if they are considered by the given function not to be yet present.
-func AppendedUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) S {
+func CopyAppendUniqueFunc[S ~[]E, E any](in S, eq func(E, E) bool, add ...E) S {
 	in = slices.Clone(in)
 	for _, v := range add {
-		if !slices.ContainsFunc(in, func(e E) bool { return cmp(v, e) == 0 }) {
+		if !slices.ContainsFunc(in, func(e E) bool { return eq(v, e) }) {
 			in = append(in, v)
 		}
 	}
