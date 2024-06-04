@@ -4,6 +4,12 @@ type Option[T any] interface {
 	ApplyTo(T)
 }
 
+// NoOption is an option that does nothing. This can be returned by Option Factory functions instead of nil to avoid
+// consecutive nil pointer exceptions.
+type NoOption[T any] struct{}
+
+func (NoOption[T]) ApplyTo(T) {}
+
 // EvalOptions applies options to a new options object
 // and returns this object.
 // O must be a struct type.
