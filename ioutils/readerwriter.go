@@ -1,7 +1,10 @@
 package ioutils
 
 import (
+	"github.com/mandelsoft/goutils/general"
 	"io"
+	"os"
+	"sync"
 
 	"github.com/mandelsoft/goutils/errors"
 	"github.com/mandelsoft/goutils/generics"
@@ -89,4 +92,60 @@ func AddWriterCloser(writer io.Writer, closer io.Closer, msg ...interface{}) io.
 
 func (c *writeCloser) Write(p []byte) (n int, err error) {
 	return c.wrapped.Write(p)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+type DupReadCloser interface {
+	io.ReadCloser
+	Dup() (DupReadCloser, error)
+}
+
+type dupReadCloser struct {
+	lock  sync.Mutex
+	rc    io.ReadCloser
+	count int
+}
+
+func (d *dupReadCloser) Read(p []byte) (n int, err error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	return d.rc.Read(p)
+}
+
+func (d *dupReadCloser) Close() error {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+	if d.count == 0 {
+		return os.ErrClosed
+	}
+	d.count--
+	if d.count == 0 {
+		return d.rc.Close()
+	}
+	return nil
+}
+
+func (d *dupReadCloser) Dup() (DupReadCloser, error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if d.count == 0 {
+		return nil, os.ErrClosed
+	}
+	d.count++
+	return d, nil
+}
+
+func NewDupReadCloser(rc io.ReadCloser, errs ...error) (DupReadCloser, error) {
+	if err := general.Optional(errs...); err != nil {
+		return nil, err
+	}
+	if d, ok := rc.(*dupReadCloser); ok {
+		return d.Dup()
+	}
+	return &dupReadCloser{
+		rc:    rc,
+		count: 1,
+	}, nil
 }
