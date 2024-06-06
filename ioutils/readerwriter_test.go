@@ -71,8 +71,10 @@ var _ = Describe("Test Environment", func() {
 			r2 := Must(r.Dup())
 			MustBeSuccessful(r.Close())
 			Expect(reader.IsClosed()).To(BeFalse())
+			Expect(r.Close()).To(BeIdenticalTo(os.ErrClosed))
 			MustBeSuccessful(r2.Close())
 			Expect(reader.IsClosed()).To(BeTrue())
+			Expect(r2.Close()).To(BeIdenticalTo(os.ErrClosed))
 		})
 
 		It("reads using multiple views", func() {
