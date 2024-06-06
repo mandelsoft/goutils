@@ -1,10 +1,12 @@
 package ioutils
 
 import (
-	"github.com/mandelsoft/goutils/general"
 	"io"
 	"os"
 	"sync"
+	"sync/atomic"
+
+	"github.com/mandelsoft/goutils/general"
 
 	"github.com/mandelsoft/goutils/errors"
 	"github.com/mandelsoft/goutils/generics"
@@ -101,51 +103,95 @@ type DupReadCloser interface {
 	Dup() (DupReadCloser, error)
 }
 
+// dupReadCloser is the internal representation
+// with ref counting for a dup reader view.
 type dupReadCloser struct {
-	lock  sync.Mutex
 	rc    io.ReadCloser
-	count int
+	count atomic.Int64
 }
 
-func (d *dupReadCloser) Read(p []byte) (n int, err error) {
+var _ DupReadCloser = (*dupViewReadCloser)(nil)
+
+type dupViewReadCloser struct {
+	lock sync.Mutex
+	r    *dupReadCloser
+}
+
+func (d *dupViewReadCloser) Read(p []byte) (n int, err error) {
 	d.lock.Lock()
 	defer d.lock.Unlock()
+
+	if d.r == nil {
+		return 0, os.ErrClosed
+	}
+	return d.r.Read(p)
+}
+
+func (d *dupViewReadCloser) Close() error {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if d.r == nil {
+		return os.ErrClosed
+	}
+	err := d.r.Close()
+	d.r = nil
+	return err
+}
+
+func (d *dupViewReadCloser) Dup() (DupReadCloser, error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
+
+	if d.r == nil {
+		return nil, os.ErrClosed
+	}
+	return d.r.Dup(), nil
+}
+
+////
+
+func (d *dupReadCloser) Read(p []byte) (n int, err error) {
 	return d.rc.Read(p)
 }
 
 func (d *dupReadCloser) Close() error {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-	if d.count == 0 {
+	c := d.count.Add(-1)
+	if c < 0 {
 		return os.ErrClosed
 	}
-	d.count--
-	if d.count == 0 {
-		return d.rc.Close()
+	if c > 0 {
+		return nil
 	}
-	return nil
+	return d.rc.Close()
 }
 
-func (d *dupReadCloser) Dup() (DupReadCloser, error) {
-	d.lock.Lock()
-	defer d.lock.Unlock()
-
-	if d.count == 0 {
-		return nil, os.ErrClosed
+func (d *dupReadCloser) Dup() DupReadCloser {
+	d.count.Add(1)
+	return &dupViewReadCloser{
+		r: d,
 	}
-	d.count++
-	return d, nil
 }
 
+// NewDupReadCloser provides a reader which can be duplicated.
+// Duplicated means, that a new separately closeable reader is
+// provided. The original reader is closed with the close
+// of the last provided reader view.
+// The passed reader must never be explicitly closed.
+// It is closed with the last provided DupReadCloser.
+// If called for a DupReadCloser, just a new view is provided.
+// If called for an already closed reader, read calls
+// will provide the behaviour of the passed reader.
+// Close will succeed until the view is closed, which
+// will provide the behaviour of the passed reader.
 func NewDupReadCloser(rc io.ReadCloser, errs ...error) (DupReadCloser, error) {
 	if err := general.Optional(errs...); err != nil {
 		return nil, err
 	}
-	if d, ok := rc.(*dupReadCloser); ok {
-		return d.Dup()
+	if d, ok := rc.(DupReadCloser); ok {
+		return d, nil
 	}
-	return &dupReadCloser{
-		rc:    rc,
-		count: 1,
-	}, nil
+	return (&dupReadCloser{
+		rc: rc,
+	}).Dup(), nil
 }
