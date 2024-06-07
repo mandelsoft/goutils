@@ -1,9 +1,10 @@
 package testutils_test
 
 import (
-	me "github.com/mandelsoft/goutils/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	me "github.com/mandelsoft/goutils/testutils"
 )
 
 var _ = Describe("normalization", func() {

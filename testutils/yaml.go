@@ -3,12 +3,12 @@ package testutils
 import (
 	"fmt"
 	"reflect"
+	"sigs.k8s.io/yaml"
 	"strings"
 
 	"github.com/go-test/deep"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
-	"sigs.k8s.io/yaml"
 )
 
 // YAMLEqual compares two yaml structures.

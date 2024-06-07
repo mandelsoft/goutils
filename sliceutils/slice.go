@@ -3,6 +3,7 @@ package sliceutils
 import (
 	"slices"
 
+	"github.com/mandelsoft/goutils/general"
 	"github.com/mandelsoft/goutils/generics"
 	"github.com/mandelsoft/goutils/matcher"
 )
@@ -37,7 +38,7 @@ func CopyAppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 
 // AppendUniqueFunc returns appends additional elements,
 // if they are considered by the given function not to be yet present.
-func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) S {
+func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp general.CompareFunc[E], add ...E) S {
 	for _, v := range add {
 		if !slices.ContainsFunc(in, func(e E) bool { return cmp(v, e) == 0 }) {
 			in = append(in, v)
@@ -48,7 +49,7 @@ func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp func(E, E) int, add ...E) 
 
 // CopyAppendUniqueFunc returns a new slice with additional elements appended,
 // if they are considered by the given function not to be yet present.
-func CopyAppendUniqueFunc[S ~[]E, E any](in S, eq func(E, E) bool, add ...E) S {
+func CopyAppendUniqueFunc[S ~[]E, E any](in S, eq general.EqualsFunc[E], add ...E) S {
 	in = slices.Clone(in)
 	for _, v := range add {
 		if !slices.ContainsFunc(in, func(e E) bool { return eq(v, e) }) {

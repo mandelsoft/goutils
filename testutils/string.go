@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/drone/envsubst"
+	"github.com/mandelsoft/goutils/errors"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
 )
@@ -138,7 +139,7 @@ func (matcher *StringEqualMatcher) Match(actual interface{}) (success bool, err 
 		}
 		r, err := regexp.Compile(expected)
 		if err != nil {
-			return false, fmt.Errorf("Invalid regular expression %q: %w", expected, err)
+			return false, errors.Wrapf(err, "Invalid regular expression %q", matcher.Regex)
 		}
 		if matcher.Trim {
 			return r.MatchString(strings.TrimSpace(s)), nil

@@ -1,13 +1,15 @@
 package pkgutils_test
 
 import (
-	"github.com/mandelsoft/goutils/generics"
-	me "github.com/mandelsoft/goutils/pkgutils"
-	"github.com/mandelsoft/goutils/pkgutils/testpackage"
+	"reflect"
+
 	. "github.com/mandelsoft/goutils/testutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"reflect"
+
+	"github.com/mandelsoft/goutils/generics"
+	me "github.com/mandelsoft/goutils/pkgutils"
+	"github.com/mandelsoft/goutils/pkgutils/testpackage"
 )
 
 type typ struct{}

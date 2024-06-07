@@ -3,15 +3,14 @@ package testutils
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mandelsoft/goutils/general"
 	"io"
+	"sigs.k8s.io/yaml"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"github.com/onsi/gomega/types"
-	"sigs.k8s.io/yaml"
-
-	"github.com/mandelsoft/goutils/general"
 )
 
 func Close(c io.Closer, msg ...interface{}) {
