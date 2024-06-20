@@ -3,8 +3,10 @@ package testutils
 import (
 	"fmt"
 	"reflect"
-	"sigs.k8s.io/yaml"
 	"strings"
+
+	"github.com/mandelsoft/goutils/substutils"
+	"sigs.k8s.io/yaml"
 
 	"github.com/go-test/deep"
 	"github.com/onsi/gomega/format"
@@ -14,7 +16,7 @@ import (
 // YAMLEqual compares two yaml structures.
 // If value mappings are given, the expected string is evaluated by envsubst, first.
 // It is an error for actual to be nil.  Use BeNil() instead.
-func YAMLEqual(expected interface{}, subst ...Substitutions) types.GomegaMatcher {
+func YAMLEqual(expected interface{}, subst ...substutils.Substitution) types.GomegaMatcher {
 	data, err := AsStructure(expected, subst...)
 	if err != nil {
 		return &reportError{err}

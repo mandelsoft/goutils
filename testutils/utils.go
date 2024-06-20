@@ -3,8 +3,10 @@ package testutils
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mandelsoft/goutils/general"
 	"io"
+
+	"github.com/mandelsoft/goutils/general"
+	"github.com/mandelsoft/goutils/substutils"
 	"sigs.k8s.io/yaml"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -127,7 +129,7 @@ func AsString(actual interface{}) (string, error) {
 	return s, nil
 }
 
-func AsStructure(actual interface{}, substs ...Substitutions) (interface{}, error) {
+func AsStructure(actual interface{}, substs ...substutils.Substitution) (interface{}, error) {
 	var err error
 
 	s, ok := actual.(string)
@@ -141,8 +143,8 @@ func AsStructure(actual interface{}, substs ...Substitutions) (interface{}, erro
 		}
 		s = string(b)
 	}
-	if subst := MergeSubst(substs...); len(subst) != 0 {
-		s, err = eval(s, subst)
+	if len(substs) > 0 {
+		s, err = eval(s, substs...)
 		if err != nil {
 			return nil, err
 		}

@@ -6,15 +6,16 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/drone/envsubst"
 	"github.com/mandelsoft/goutils/errors"
+	"github.com/mandelsoft/goutils/substutils"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
 )
 
-type Substitutions = map[string]string
+type Substitutions = substutils.SubstitutionMap
 
-func SubstList(values ...string) map[string]string {
+// Deprecated: use substutils.SubstList.
+func SubstList(values ...string) Substitutions {
 	r := map[string]string{}
 	for i := 0; i+1 < len(values); i += 2 {
 		r[values[i]] = values[i+1]
@@ -22,7 +23,7 @@ func SubstList(values ...string) map[string]string {
 	return r
 }
 
-func SubstFrom(v interface{}, prefix ...string) map[string]string {
+func SubstFrom(v interface{}, prefix ...string) Substitutions {
 	data, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
@@ -43,7 +44,8 @@ func SubstFrom(v interface{}, prefix ...string) map[string]string {
 	return values
 }
 
-func MergeSubst(subst ...map[string]string) map[string]string {
+// Deprecated: use substutils.MergeMapSubstitution.
+func MergeSubst(subst ...substutils.SubstitutionMap) substutils.SubstitutionMap {
 	r := map[string]string{}
 	for _, s := range subst {
 		for k, v := range s {
@@ -57,7 +59,7 @@ func MergeSubst(subst ...map[string]string) map[string]string {
 // as error context.
 // If value mappings are given, the expected string is evaluated by envsubst, first.
 // It is an error for actual to be nil.  Use BeNil() instead.
-func StringEqualTrimmedWithContext(expected string, subst ...Substitutions) types.GomegaMatcher {
+func StringEqualTrimmedWithContext(expected string, subst ...substutils.Substitution) types.GomegaMatcher {
 	var err error
 	expected, err = eval(expected, subst...)
 	if err != nil {
@@ -73,7 +75,7 @@ func StringEqualTrimmedWithContext(expected string, subst ...Substitutions) type
 // expression and provides the complete actual value as error context.
 // If value mappings are given, the expected string is evaluated by envsubst, first.
 // It is an error for actual to be nil.  Use BeNil() instead.
-func StringMatchTrimmedWithContext(expected string, subst ...Substitutions) types.GomegaMatcher {
+func StringMatchTrimmedWithContext(expected string, subst ...substutils.Substitution) types.GomegaMatcher {
 	var err error
 	expected, err = eval(expected, subst...)
 	if err != nil {
@@ -90,7 +92,7 @@ func StringMatchTrimmedWithContext(expected string, subst ...Substitutions) type
 // as error context.
 // If value mappings are given, the expected string is evaluated by envsubst, first.
 // It is an error for actual to be nil.  Use BeNil() instead.
-func StringEqualWithContext(expected string, subst ...Substitutions) types.GomegaMatcher {
+func StringEqualWithContext(expected string, subst ...substutils.Substitution) types.GomegaMatcher {
 	var err error
 	expected, err = eval(expected, subst...)
 	if err != nil {
@@ -105,7 +107,7 @@ func StringEqualWithContext(expected string, subst ...Substitutions) types.Gomeg
 // the complete actual value as error context.
 // If value mappings are given, the expected string is evaluated by envsubst, first.
 // It is an error for actual to be nil.  Use BeNil() instead.
-func StringMatchWithContext(expected string, subst ...Substitutions) types.GomegaMatcher {
+func StringMatchWithContext(expected string, subst ...substutils.Substitution) types.GomegaMatcher {
 	var err error
 	expected, err = eval(expected, subst...)
 	if err != nil {
@@ -178,9 +180,9 @@ func (matcher *StringEqualMatcher) NegatedFailureMessage(actual interface{}) (me
 	return format.Message(actual, "not to equal", matcher.Expected)
 }
 
-func eval(expected string, subst ...Substitutions) (string, error) {
+func eval(expected string, subst ...substutils.Substitution) (string, error) {
 	if len(subst) > 0 {
-		return envsubst.Eval(expected, stringmapping(subst...))
+		return substutils.Eval(expected, subst...)
 	}
 	return expected, nil
 }

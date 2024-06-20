@@ -134,3 +134,13 @@ func Transform[S ~[]E, E any, T any](in S, m func(E) T) []T {
 	}
 	return r
 }
+
+func Reverse[S ~[]E, E any](in S) S {
+	// if non-nil, provide always a separately modifiable copy.
+	if in == nil {
+		return in
+	}
+	s := slices.Clone(in)
+	slices.Reverse(s)
+	return s
+}
