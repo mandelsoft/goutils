@@ -144,3 +144,15 @@ func Reverse[S ~[]E, E any](in S) S {
 	slices.Reverse(s)
 	return s
 }
+
+// FilterType filters elements of a dedicated super type from
+// a list of specialized types.
+func FilterType[T any, S ~[]E, E any](elems S) []T {
+	var r []T
+	for _, e := range elems {
+		if t, ok := generics.TryCast[T](e); ok {
+			r = append(r, t)
+		}
+	}
+	return r
+}
