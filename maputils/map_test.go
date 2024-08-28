@@ -32,15 +32,63 @@ var _ = Describe("MapUtils Test Environment", func() {
 			}))
 		})
 
+		It("transforms values into slice", func() {
+			in := map[string]int{
+				"alice": 24,
+				"bob":   25,
+			}
+
+			Expect(maputils.TransformedValues(in, TransformValue)).To(ConsistOf([]string{
+				"24",
+				"25",
+			}))
+		})
+
+		It("transforms values into ordered slice", func() {
+			in := map[string]int{
+				"alice": 24,
+				"bob":   25,
+			}
+
+			Expect(maputils.OrderedTransformedValues(in, TransformValue)).To(Equal([]string{
+				"24",
+				"25",
+			}))
+		})
+
 		It("transforms keys", func() {
 			in := map[string]int{
 				"alice": 24,
 				"bob":   25,
 			}
 
-			Expect(maputils.MapKeys(in, TransformKey)).To(Equal(map[string]int{
+			Expect(maputils.TransformKeys(in, TransformKey)).To(Equal(map[string]int{
 				"ALICE": 24,
 				"BOB":   25,
+			}))
+		})
+
+		It("transforms keys into slice", func() {
+			in := map[string]int{
+				"alice": 24,
+				"bob":   25,
+			}
+
+			Expect(maputils.TransformedKeys(in, TransformKey)).To(ConsistOf([]string{
+				"ALICE",
+				"BOB",
+			}))
+		})
+
+		It("transforms keys into ordered slice", func() {
+			in := map[string]int{
+				"alice": 24,
+				"bob":   25,
+			}
+
+			Expect(maputils.TransformedKeys(in, TransformKey)).To(Equal([]string{
+				"ALICE",
+				"BOB",
 			}))
 		})
 

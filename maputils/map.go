@@ -107,7 +107,7 @@ func Transform[M ~map[K]V, K comparable, V any, TK comparable, TV any](in M, m T
 	return r
 }
 
-func MapKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer.Transformer[K, TK]) map[TK]V {
+func TransformKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer.Transformer[K, TK]) map[TK]V {
 	r := map[TK]V{}
 	for k, v := range in {
 		tk := m(k)
@@ -116,11 +116,63 @@ func MapKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer
 	return r
 }
 
-func TransformValues[M ~map[K]V, K comparable, V any, TV comparable](in M, m transformer.Transformer[V, TV]) map[K]TV {
+func TransformedKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer.Transformer[K, TK], cmp ...CompareFunc[TK]) []TK {
+	r := make([]TK, len(in))
+	i := 0
+	for k := range in {
+		tk := m(k)
+		r[i] = tk
+		i++
+	}
+	if len(cmp) > 0 {
+		slices.SortFunc(r, cmp[0])
+	}
+	return r
+}
+
+func OrderedTransformedKeys[M ~map[K]V, K comparable, V any, TK cmp.Ordered](in M, m transformer.Transformer[K, TK]) []TK {
+	r := make([]TK, len(in))
+	i := 0
+	for k := range in {
+		tk := m(k)
+		r[i] = tk
+		i++
+	}
+	slices.Sort(r)
+	return r
+}
+
+func TransformValues[M ~map[K]V, K comparable, V any, TV any](in M, m transformer.Transformer[V, TV]) map[K]TV {
 	r := map[K]TV{}
 	for k, v := range in {
 		tv := m(v)
 		r[k] = tv
 	}
+	return r
+}
+
+func TransformedValues[M ~map[K]V, K comparable, V any, TV any](in M, m transformer.Transformer[V, TV], cmp ...CompareFunc[TV]) []TV {
+	r := make([]TV, len(in))
+	i := 0
+	for _, v := range in {
+		tv := m(v)
+		r[i] = tv
+		i++
+	}
+	if len(cmp) > 0 {
+		slices.SortFunc(r, cmp[0])
+	}
+	return r
+}
+
+func OrderedTransformedValues[M ~map[K]V, K comparable, V any, TV cmp.Ordered](in M, m transformer.Transformer[V, TV]) []TV {
+	r := make([]TV, len(in))
+	i := 0
+	for _, v := range in {
+		tv := m(v)
+		r[i] = tv
+		i++
+	}
+	slices.Sort(r)
 	return r
 }
