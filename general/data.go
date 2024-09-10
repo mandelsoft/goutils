@@ -22,6 +22,12 @@ func ContainsForCompareFuncFor[E any](a E, cmp CompareFunc[E]) ContainsFunc[E] {
 	}
 }
 
+func ContainsForEqualsFuncFor[E any](a E, eq EqualsFunc[E]) ContainsFunc[E] {
+	return func(b E) bool {
+		return eq(a, b)
+	}
+}
+
 type Equals[E any] interface {
 	Equals(a E) bool
 }

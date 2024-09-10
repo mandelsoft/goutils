@@ -38,9 +38,9 @@ func CopyAppendUnique[S ~[]E, E comparable](in S, add ...E) S {
 
 // AppendUniqueFunc returns appends additional elements,
 // if they are considered by the given function not to be yet present.
-func AppendUniqueFunc[S ~[]E, E comparable](in S, cmp general.CompareFunc[E], add ...E) S {
+func AppendUniqueFunc[S ~[]E, E any](in S, eq general.EqualsFunc[E], add ...E) S {
 	for _, v := range add {
-		if !slices.ContainsFunc(in, func(e E) bool { return cmp(v, e) == 0 }) {
+		if !slices.ContainsFunc(in, func(e E) bool { return eq(v, e) }) {
 			in = append(in, v)
 		}
 	}
@@ -155,4 +155,23 @@ func FilterType[T any, S ~[]E, E any](elems S) []T {
 		}
 	}
 	return r
+}
+
+// InitialSliceFor provides a new initial slice with length and capacity
+// taken from the given one.
+func InitialSliceFor[S ~[]E, E any](in S) S {
+	return make(S, len(in), len(in))
+}
+
+// InitialSliceWithTypeFor is like InitialSliceFor, but provides a slice of the
+// explicitly given type TS instead of the one from the given slice S.
+func InitialSliceWithTypeFor[TS ~[]TE, TE any, S ~[]E, E any](in S) TS {
+	return make(TS, len(in), len(in))
+}
+
+// AsSlice provides a slice for a given list of elements.
+// If the elements are not og the same type, but only share a common super type,
+// the intended super type must be passed as type parameter.
+func AsSlice[T any](elems ...T) []T {
+	return elems
 }
