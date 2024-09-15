@@ -29,7 +29,7 @@ func WithGenericOption[S, B any, T any](v T) Option[B] {
 }
 
 // WithOptionalGenericOption povides an option if the given pointer
-// is not nil. It the behaves like WithGenericOption for the de-referenced value.
+// is not nil. It then behaves like WithGenericOption for the de-referenced value.
 func WithOptionalGenericOption[S, B any, T any](v *T) Option[B] {
 	if v != nil {
 		return WithGenericOption[S, B, T](*v)
