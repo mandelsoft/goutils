@@ -15,7 +15,7 @@ func (o *genricoption[S, B, T]) ApplyTo(opts B) {
 	reflectutils.CallMethodByInterfaceVA[S](opts, o.value)
 }
 
-// WithGenericOption provides a generic option implementation for Option[T]
+// WithGenericOption provides a generic option implementation for Option[B]
 // intended for options based on an option setter interface S implemented
 // by the option set B implementing S for the value type T. Hereby, B must
 // implement S, which cannot be expressed by Go generics.

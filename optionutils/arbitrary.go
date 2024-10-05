@@ -34,9 +34,10 @@ func EvalArbitraryOptions[I ArbitraryOption, O any](opts ...I) *O {
 // pointer type. I is the option interface declaring the apply
 // method.
 func ApplyArbitraryOptions[I ArbitraryOption, O any](opts O, list ...I) {
+	m := reflectutils.GetInterfaceMethod[I]()
 	for _, opt := range list {
 		if !reflect2.IsNil(opt) {
-			reflectutils.CallMethodByInterfaceVA[I](opt, opts)
+			reflectutils.CallMethodByNameVA(m.Name, opt, opts)
 		}
 	}
 }
