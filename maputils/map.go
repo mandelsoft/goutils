@@ -99,6 +99,9 @@ func KeyValueTransformer[K, V, TK, TV any](tk transformer.Transformer[K, TK], tv
 }
 
 func Transform[M ~map[K]V, K comparable, V any, TK comparable, TV any](in M, m Transformer[K, V, TK, TV]) map[TK]TV {
+	if in == nil {
+		return nil
+	}
 	r := map[TK]TV{}
 	for k, v := range in {
 		tk, tv := m(k, v)
@@ -108,6 +111,9 @@ func Transform[M ~map[K]V, K comparable, V any, TK comparable, TV any](in M, m T
 }
 
 func TransformKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer.Transformer[K, TK]) map[TK]V {
+	if in == nil {
+		return nil
+	}
 	r := map[TK]V{}
 	for k, v := range in {
 		tk := m(k)
@@ -117,6 +123,9 @@ func TransformKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m trans
 }
 
 func TransformedKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m transformer.Transformer[K, TK], cmp ...CompareFunc[TK]) []TK {
+	if in == nil {
+		return nil
+	}
 	r := make([]TK, len(in))
 	i := 0
 	for k := range in {
@@ -131,6 +140,9 @@ func TransformedKeys[M ~map[K]V, K comparable, V any, TK comparable](in M, m tra
 }
 
 func OrderedTransformedKeys[M ~map[K]V, K comparable, V any, TK cmp.Ordered](in M, m transformer.Transformer[K, TK]) []TK {
+	if in == nil {
+		return nil
+	}
 	r := make([]TK, len(in))
 	i := 0
 	for k := range in {
@@ -143,6 +155,9 @@ func OrderedTransformedKeys[M ~map[K]V, K comparable, V any, TK cmp.Ordered](in 
 }
 
 func TransformValues[M ~map[K]V, K comparable, V any, TV any](in M, m transformer.Transformer[V, TV]) map[K]TV {
+	if in == nil {
+		return nil
+	}
 	r := map[K]TV{}
 	for k, v := range in {
 		tv := m(v)
@@ -152,6 +167,9 @@ func TransformValues[M ~map[K]V, K comparable, V any, TV any](in M, m transforme
 }
 
 func TransformedValues[M ~map[K]V, K comparable, V any, TV any](in M, m transformer.Transformer[V, TV], cmp ...CompareFunc[TV]) []TV {
+	if in == nil {
+		return nil
+	}
 	r := make([]TV, len(in))
 	i := 0
 	for _, v := range in {
@@ -166,6 +184,9 @@ func TransformedValues[M ~map[K]V, K comparable, V any, TV any](in M, m transfor
 }
 
 func OrderedTransformedValues[M ~map[K]V, K comparable, V any, TV cmp.Ordered](in M, m transformer.Transformer[V, TV]) []TV {
+	if in == nil {
+		return nil
+	}
 	r := make([]TV, len(in))
 	i := 0
 	for _, v := range in {

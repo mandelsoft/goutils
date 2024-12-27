@@ -128,6 +128,9 @@ func Filter[S ~[]E, E any](in S, f matcher.Matcher[E]) S {
 }
 
 func Transform[S ~[]E, E any, T any](in S, m func(E) T) []T {
+	if in == nil {
+		return nil
+	}
 	r := make([]T, len(in))
 	for i, v := range in {
 		r[i] = m(v)
