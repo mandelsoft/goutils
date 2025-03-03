@@ -1,6 +1,7 @@
 package sliceutils
 
 import (
+	"cmp"
 	"slices"
 
 	"github.com/mandelsoft/goutils/general"
@@ -177,4 +178,86 @@ func InitialSliceWithTypeFor[TS ~[]TE, TE any, S ~[]E, E any](in S) TS {
 // the intended super type must be passed as type parameter.
 func AsSlice[T any](elems ...T) []T {
 	return elems
+}
+
+// InsertAscending inserts an element into an ordered ascending slice.
+func InsertAscending[S ~[]E, E cmp.Ordered](in S, e E) S {
+	for i, c := range in {
+		if c >= e {
+			return slices.Insert(in, i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertDescending inserts an element into an ordered descending slice.
+func InsertDescending[S ~[]E, E cmp.Ordered](in S, e E) S {
+	for i, c := range in {
+		if c < e {
+			return slices.Insert(in, i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertAscendingFunc inserts an element into an ascending slice according to a
+// general.CompareFunc.
+func InsertAscendingFunc[S ~[]E, E any](in S, e E, cmp general.CompareFunc[E]) S {
+	for i, c := range in {
+		if cmp(c, e) >= 0 {
+			return slices.Insert(in, i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertDescendingFunc inserts an element into a descending slice according to a
+// general.CompareFunc.
+func InsertDescendingFunc[S ~[]E, E any](in S, e E, cmp general.CompareFunc[E]) S {
+	for i, c := range in {
+		if cmp(c, e) < 0 {
+			return slices.Insert(in, i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertBeforeFirstFunc inserts an element into a slice before a matching element.
+func InsertBeforeFirstFunc[S ~[]E, E any](in S, e E, match matcher.Matcher[E]) S {
+	for i, c := range in {
+		if match(c) {
+			return slices.Insert(in, i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertAfterFirstFunc inserts an element into a slice before a matching element.
+func InsertAfterFirstFunc[S ~[]E, E any](in S, e E, match matcher.Matcher[E]) S {
+	for i, c := range in {
+		if match(c) {
+			return slices.Insert(in, i+1, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertAfterLastFunc inserts an element into a slice after the last matching element.
+func InsertAfterLastFunc[S ~[]E, E any](in S, e E, match matcher.Matcher[E]) S {
+	for i := range in {
+		if match(in[len(in)-i-1]) {
+			return slices.Insert(in, len(in)-i, e)
+		}
+	}
+	return append(in, e)
+}
+
+// InsertBeforeLastFunc inserts an element into a slice after the last matching element.
+func InsertBeforeLastFunc[S ~[]E, E any](in S, e E, match matcher.Matcher[E]) S {
+	for i := range in {
+		if match(in[len(in)-i-1]) {
+			return slices.Insert(in, len(in)-i-1, e)
+		}
+	}
+	return append(in, e)
 }
