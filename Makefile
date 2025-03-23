@@ -1,5 +1,5 @@
 
-REPO_ROOT:= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))../..
+REPO_ROOT:= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 PLATFORMS = linux/amd64 linux/arm64 darwin/arm64 darwin/amd64 windows/amd64
 

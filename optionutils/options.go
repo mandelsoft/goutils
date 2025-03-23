@@ -1,5 +1,9 @@
 package optionutils
 
+import (
+	"github.com/mandelsoft/goutils/general"
+)
+
 type Option[T any] interface {
 	ApplyTo(T)
 }
@@ -29,4 +33,10 @@ func ApplyOptions[O any](opts O, list ...Option[O]) {
 			opt.ApplyTo(opts)
 		}
 	}
+}
+
+// BoolOption can be used to implement Flag options, with
+// optional vool argument enabled by default.
+func BoolOption(b ...bool) bool {
+	return general.OptionalDefaultedBool(true, b...)
 }
