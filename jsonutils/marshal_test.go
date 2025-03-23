@@ -102,7 +102,7 @@ var _ = Describe("Test Environment", func() {
 			G1: G1{
 				Field: "text",
 			},
-			Flat: generics.Pointer("pointer"),
+			Flat: generics.PointerTo("pointer"),
 		}
 
 		EMPTY := `{"Flat":null,"explicit":{}}`
@@ -149,7 +149,7 @@ var _ = Describe("Test Environment", func() {
 			G1: &G1{
 				Field: "text",
 			},
-			Flat: generics.Pointer("pointer"),
+			Flat: generics.PointerTo("pointer"),
 		}
 
 		EMPTY := `{"Flat":null,"explicit":{}}`

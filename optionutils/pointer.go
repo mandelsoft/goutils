@@ -4,9 +4,9 @@ import (
 	"github.com/mandelsoft/goutils/general"
 )
 
+// Deprecated: use generics.PointerTo.
 func PointerTo[T any](v T) *T {
-	temp := v
-	return &temp
+	return &v
 }
 
 func AsValue[T any](p *T) T {
