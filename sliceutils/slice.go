@@ -128,6 +128,9 @@ func Filter[S ~[]E, E any](in S, f matcher.Matcher[E]) S {
 	return r
 }
 
+// Transform maps the elements of a slice using
+// a mapping function (m) to elements of type T and returns the resulting
+// slice.
 func Transform[S ~[]E, E any, T any](in S, m func(E) T) []T {
 	if in == nil {
 		return nil
@@ -137,6 +140,19 @@ func Transform[S ~[]E, E any, T any](in S, m func(E) T) []T {
 		r[i] = m(v)
 	}
 	return r
+}
+
+// Aggregate aggregates slice elements into a single value of type A
+// using an aggregation function (f) and an initial aggregation
+// value (a).
+func Aggregate[A any, S ~[]E, E any](in S, a A, f func(A, E) A) A {
+	if in == nil {
+		return a
+	}
+	for _, v := range in {
+		a = f(a, v)
+	}
+	return a
 }
 
 func Reverse[S ~[]E, E any](in S) S {
@@ -260,4 +276,54 @@ func InsertBeforeLastFunc[S ~[]E, E any](in S, e E, match matcher.Matcher[E]) S 
 		}
 	}
 	return append(in, e)
+}
+
+func HasPrefix[S ~[]E, E comparable](in S, prefix ...E) bool {
+	if len(in) < len(prefix) {
+		return false
+	}
+	for i, e := range prefix {
+		if in[i] != e {
+			return false
+		}
+	}
+	return true
+}
+
+func HasPrefixFunc[S ~[]E, E any](in S, eq general.EqualsFunc[E], prefix ...E) bool {
+	if len(in) < len(prefix) {
+		return false
+	}
+	for i, e := range prefix {
+		if !eq(in[i], e) {
+			return false
+		}
+	}
+	return true
+}
+
+func HasSuffix[S ~[]E, E comparable](in S, prefix ...E) bool {
+	if len(in) < len(prefix) {
+		return false
+	}
+	o := len(in) - len(prefix)
+	for i, e := range prefix {
+		if in[i+o] != e {
+			return false
+		}
+	}
+	return true
+}
+
+func HasSuffixFunc[S ~[]E, E any](in S, eq general.EqualsFunc[E], prefix ...E) bool {
+	if len(in) < len(prefix) {
+		return false
+	}
+	o := len(in) - len(prefix)
+	for i, e := range prefix {
+		if !eq(in[i+o], e) {
+			return false
+		}
+	}
+	return true
 }

@@ -1,6 +1,8 @@
 package sliceutils_test
 
 import (
+	"strconv"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -60,4 +62,121 @@ var _ = Describe("SliceUtils Test Environment", func() {
 			Expect(sliceutils.InsertBeforeLastFunc([]int{1, 3, 3, 3, 5}, 0, Match)).To(Equal([]int{1, 3, 3, 0, 3, 5}))
 		})
 	})
+
+	Context("aggregate", func() {
+		It("aggregates empty", func() {
+			data := []int{}
+
+			r := sliceutils.Aggregate(data, "x", func(s string, i int) string { return s + strconv.Itoa(i) })
+			Expect(r).To(Equal("x"))
+		})
+
+		It("aggregates", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			r := sliceutils.Aggregate(data, "x", func(s string, i int) string { return s + strconv.Itoa(i) })
+			Expect(r).To(Equal("x12345"))
+		})
+	})
+
+	Context("prefix", func() {
+		It("accepts prefix", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasPrefix(data, 1)).To(BeTrue())
+			Expect(sliceutils.HasPrefix(data, 1, 2)).To(BeTrue())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3)).To(BeTrue())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3, 4)).To(BeTrue())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3, 4, 5)).To(BeTrue())
+		})
+
+		It("accepts prefix by func", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1)).To(BeTrue())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2)).To(BeTrue())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3)).To(BeTrue())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3, 4)).To(BeTrue())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3, 4, 5)).To(BeTrue())
+		})
+
+		It("rejects prefix", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasPrefix(data, 2)).To(BeFalse())
+			Expect(sliceutils.HasPrefix(data, 1, 3)).To(BeFalse())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 4)).To(BeFalse())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3, 5)).To(BeFalse())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasPrefix(data, 1, 2, 3, 4, 5, 6)).To(BeFalse())
+		})
+
+		It("rejects prefix by func", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasPrefixFunc(data, equals, 2)).To(BeFalse())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 3)).To(BeFalse())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 4)).To(BeFalse())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3, 5)).To(BeFalse())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasPrefixFunc(data, equals, 1, 2, 3, 4, 5, 6)).To(BeFalse())
+		})
+	})
+
+	Context("suffix", func() {
+
+		It("accepts suffix", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasSuffix(data, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffix(data, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffix(data, 3, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffix(data, 2, 3, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffix(data, 1, 2, 3, 4, 5)).To(BeTrue())
+		})
+
+		It("rejects suffix", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasSuffix(data, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 5, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 4, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 3, 3, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 2, 2, 3, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 1, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffix(data, 1, 2, 3, 4, 5, 6)).To(BeFalse())
+		})
+
+		It("accepts suffix by func", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasSuffixFunc(data, equals, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 3, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 2, 3, 4, 5)).To(BeTrue())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 1, 2, 3, 4, 5)).To(BeTrue())
+		})
+
+		It("rejects suffix", func() {
+			data := []int{1, 2, 3, 4, 5}
+
+			Expect(sliceutils.HasSuffixFunc(data, equals, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 5, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 4, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 3, 3, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 2, 2, 3, 4, 5)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 1, 2, 3, 4, 6)).To(BeFalse())
+			Expect(sliceutils.HasSuffixFunc(data, equals, 1, 2, 3, 4, 5, 6)).To(BeFalse())
+		})
+	})
 })
+
+func equals(a, b int) bool {
+	return a == b
+}
