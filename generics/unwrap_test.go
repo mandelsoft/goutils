@@ -38,6 +38,14 @@ func (t *T0) Unwrap() any {
 	return &S{}
 }
 
+type TA struct {
+	ref *TA
+}
+
+func (t *TA) Unwrap() *TA {
+	return t.ref
+}
+
 var _ = Describe("generic unwrap", func() {
 	Context("unwrap any", func() {
 		It("unwraps any type", func() {
@@ -66,6 +74,43 @@ var _ = Describe("generic unwrap", func() {
 		It("fails on wrong unwrapped type", func() {
 			_, ok := generics.UnwrapUntil[S](&T1{})
 			Expect(ok).To(BeFalse())
+		})
+	})
+
+	Context("typed", func() {
+		It("unwraps nil", func() {
+			Expect(generics.UnwrapWith[*T0](nil)).To(BeNil())
+		})
+
+		It("unwraps no match", func() {
+			Expect(generics.UnwrapWith[*T0](&T0{})).To(BeNil())
+		})
+
+		It("unwraps any type", func() {
+			t := &T1{}
+
+			Expect(generics.UnwrapWith[*T0](t)).NotTo(BeNil())
+		})
+
+		It("unwraps nil ref", func() {
+			t := &TA{}
+
+			Expect(generics.UnwrapWith[*TA](t)).To(BeNil())
+		})
+
+	})
+
+	Context("all", func() {
+		It("unwraps nil", func() {
+			Expect(generics.UnwrapAllWith[*TA](nil)).To(BeNil())
+		})
+		It("unwraps", func() {
+			b := &TA{nil}
+			r1 := &TA{b}
+			r2 := &TA{r1}
+
+			Expect(generics.UnwrapAllWith[*TA](r2)).To(BeIdenticalTo(b))
+			Expect(generics.UnwrapWith[*TA](generics.UnwrapAllWith[*TA](r2))).To(BeNil())
 		})
 	})
 })

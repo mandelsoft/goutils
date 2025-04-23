@@ -5,9 +5,10 @@ import (
 )
 
 type (
-	CompareFunc[E any]  func(a, b E) int
-	EqualsFunc[E any]   func(E, E) bool
-	ContainsFunc[E any] func(E) bool
+	CompareFunc[E any]   func(a, b E) int
+	EqualsFunc[E any]    func(E, E) bool
+	ContainsFunc[E any]  func(E) bool
+	MapperFunc[E, M any] func(E) M
 )
 
 func EqualsForCompareFuncFor[E any](cmp CompareFunc[E]) EqualsFunc[E] {
