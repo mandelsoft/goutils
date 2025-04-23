@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"reflect"
 	"slices"
 
 	"github.com/gowebpki/jcs"
@@ -12,19 +11,18 @@ import (
 )
 
 func Optional[T any](args ...T) T {
-	var _nil T
+	var zero T
 	for _, e := range args {
-		if !reflect.DeepEqual(e, _nil) {
+		if !reflect2.IsNil(e) {
 			return e
 		}
 	}
-	return _nil
+	return zero
 }
 
 func OptionalDefaulted[T any](def T, args ...T) T {
-	var _nil T
 	for _, e := range args {
-		if !reflect.DeepEqual(e, _nil) {
+		if !reflect2.IsNil(e) {
 			return e
 		}
 	}
