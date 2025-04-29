@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"reflect"
 	"slices"
 
 	"github.com/gowebpki/jcs"
@@ -20,9 +21,35 @@ func Optional[T any](args ...T) T {
 	return zero
 }
 
+// OptionalNonZero returns the first non-zero
+// element of the given list or the zero element.
+func OptionalNonZero[T any](args ...T) T {
+	var zero T
+	for _, e := range args {
+		if !reflect.DeepEqual(e, zero) {
+			return e
+		}
+	}
+	return zero
+}
+
 func OptionalDefaulted[T any](def T, args ...T) T {
 	for _, e := range args {
 		if !reflect2.IsNil(e) {
+			return e
+		}
+	}
+	return def
+}
+
+// OptionalNonZeroDefaulted returns the first non-zero
+// argument, or, if no such element is found, the given, default
+// value.
+func OptionalNonZeroDefaulted[T any](def T, args ...T) T {
+	var zero T
+
+	for _, e := range args {
+		if !reflect.DeepEqual(e, zero) {
 			return e
 		}
 	}
