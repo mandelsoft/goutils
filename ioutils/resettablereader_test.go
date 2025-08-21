@@ -3,11 +3,9 @@ package ioutils
 import (
 	"io"
 
+	"github.com/mandelsoft/goutils/ioutils/vfs"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/mandelsoft/vfs/pkg/osfs"
-	"github.com/mandelsoft/vfs/pkg/vfs"
 )
 
 const testData = "test data"
@@ -32,7 +30,7 @@ var _ = Describe("resettable reader", func() {
 		Expect(r.Close()).To(Succeed())
 
 		Expect(w.Release()).To(Succeed())
-		Expect(vfs.Exists(osfs.New(), w.path)).To(BeFalse())
+		Expect(vfs.Exists(vfs.OSFS, w.path)).To(BeFalse())
 	})
 
 	It("rereads data", func() {
@@ -60,7 +58,7 @@ var _ = Describe("resettable reader", func() {
 		Expect(r.Close()).To(Succeed())
 
 		Expect(w.Release()).To(Succeed())
-		Expect(vfs.Exists(osfs.New(), w.path)).To(BeFalse())
+		Expect(vfs.Exists(vfs.OSFS, w.path)).To(BeFalse())
 	})
 
 	It("delays delete", func() {
@@ -83,7 +81,7 @@ var _ = Describe("resettable reader", func() {
 		r, err = w.Reader()
 
 		Expect(w.Release()).To(Succeed())
-		Expect(vfs.Exists(osfs.New(), w.path)).To(BeTrue())
+		Expect(vfs.Exists(vfs.OSFS, w.path)).To(BeTrue())
 
 		Expect(err).To(Succeed())
 		data, err = io.ReadAll(r)
@@ -91,6 +89,6 @@ var _ = Describe("resettable reader", func() {
 		Expect(string(data)).To(Equal(testData))
 		Expect(r.Close()).To(Succeed())
 
-		Expect(vfs.Exists(osfs.New(), w.path)).To(BeFalse())
+		Expect(vfs.Exists(vfs.OSFS, w.path)).To(BeFalse())
 	})
 })

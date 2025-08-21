@@ -2,13 +2,13 @@ package testutils
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/mandelsoft/filepath/pkg/filepath"
 	"github.com/mandelsoft/goutils/general"
+	"github.com/mandelsoft/goutils/ioutils/vfs"
 	"github.com/mandelsoft/goutils/pkgutils"
-	"github.com/mandelsoft/vfs/pkg/osfs"
-	"github.com/mandelsoft/vfs/pkg/vfs"
 	"golang.org/x/mod/modfile"
 )
 
@@ -38,7 +38,7 @@ func GetModuleName() (string, error) {
 	}
 	pathToGoMod := filepath.Join(pathToRoot, GO_MOD)
 	// Read the content of the go.mod file
-	data, err := vfs.ReadFile(osfs.OsFs, pathToGoMod)
+	data, err := os.ReadFile(pathToGoMod)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +62,7 @@ func GetRelativePathToProjectRoot(i ...int) (string, error) {
 
 	path := "."
 	for count := 0; count < iterations; count++ {
-		if ok, err := vfs.FileExists(osfs.OsFs, filepath.Join(path, GO_MOD)); err != nil || ok {
+		if ok, err := vfs.FileExists(vfs.OSFS, filepath.Join(path, GO_MOD)); err != nil || ok {
 			if err != nil {
 				return "", fmt.Errorf("failed to check if %s exists: %w", GO_MOD, err)
 			}

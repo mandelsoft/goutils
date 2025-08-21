@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/fs"
 	"os"
 	"runtime"
 	"slices"
@@ -18,9 +19,8 @@ import (
 	"github.com/mandelsoft/goutils/datautils"
 	"github.com/mandelsoft/goutils/errors"
 	"github.com/mandelsoft/goutils/general"
+	"github.com/mandelsoft/goutils/ioutils/vfs"
 	"github.com/mandelsoft/goutils/optionutils"
-	"github.com/mandelsoft/vfs/pkg/osfs"
-	"github.com/mandelsoft/vfs/pkg/vfs"
 	"github.com/modern-go/reflect2"
 )
 
@@ -251,8 +251,8 @@ func SystemCertPool() (*x509.CertPool, error) {
 	return pool, nil
 }
 
-func RootPoolFromFile(pemfile string, useOS bool, fss ...vfs.FileSystem) (*x509.CertPool, error) {
-	fs := general.OptionalDefaulted[vfs.FileSystem](osfs.OsFs, fss...)
+func RootPoolFromFile(pemfile string, useOS bool, fss ...fs.FS) (*x509.CertPool, error) {
+	fs := general.OptionalDefaulted[fs.FS](vfs.OSFS, fss...)
 	pemdata, err := optionutils.ReadFile(pemfile, fs)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read cert pem file %q", pemfile)

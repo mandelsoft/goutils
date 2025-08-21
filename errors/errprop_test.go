@@ -17,7 +17,7 @@ func errfunc(succeed bool) func() error {
 }
 
 func testFunc(msg string, err error, succeed bool) (efferr error) {
-	defer errors.PropagateErrorf(&efferr, errfunc(succeed), msg)
+	defer errors.PropagateErrorf(&efferr, errfunc(succeed), "%s", msg)
 	return err
 }
 

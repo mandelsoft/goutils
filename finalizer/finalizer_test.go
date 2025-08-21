@@ -340,7 +340,7 @@ func errfunc(succeed bool) func() error {
 func testFunc(msg string, err error, succeed bool) (efferr error) {
 	var finalize finalizer.Finalizer
 
-	defer finalize.FinalizeWithErrorPropagationf(&efferr, msg)
+	defer finalize.FinalizeWithErrorPropagationf(&efferr, "%s", msg)
 	finalize.With(errfunc(succeed))
 	return err
 }

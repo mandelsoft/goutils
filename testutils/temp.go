@@ -7,8 +7,7 @@ import (
 
 	"github.com/mandelsoft/filepath/pkg/filepath"
 	"github.com/mandelsoft/goutils/general"
-	"github.com/mandelsoft/vfs/pkg/osfs"
-	"github.com/mandelsoft/vfs/pkg/vfs"
+	"github.com/mandelsoft/goutils/ioutils/vfs"
 )
 
 type DirContent interface {
@@ -81,7 +80,7 @@ func (d *dirContent) Copy(path string) error {
 	if err != nil {
 		return err
 	}
-	return vfs.CopyDir(osfs.OsFs, d.src, osfs.OsFs, dst)
+	return vfs.CopyDir[vfs.File, vfs.File](vfs.OSFS, d.src, vfs.OSFS, dst)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +114,7 @@ func (d *fileContent) Copy(path string) error {
 	if err != nil {
 		return err
 	}
-	return vfs.CopyFile(osfs.OsFs, d.src, osfs.OsFs, dst)
+	return vfs.CopyFile(vfs.OSFS, d.src, vfs.OSFS, dst)
 }
 
 func targetPath(dst, sub string) (string, error) {

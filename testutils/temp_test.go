@@ -4,10 +4,9 @@ import (
 	"os"
 
 	"github.com/mandelsoft/filepath/pkg/filepath"
+	"github.com/mandelsoft/goutils/ioutils/vfs"
 	"github.com/mandelsoft/goutils/sliceutils"
 	. "github.com/mandelsoft/goutils/testutils"
-	"github.com/mandelsoft/vfs/pkg/osfs"
-	"github.com/mandelsoft/vfs/pkg/vfs"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -18,10 +17,10 @@ var _ = Describe("Ttemp dir", func() {
 		defer Defer(temp.Cleanup)
 		path := temp.Path()
 
-		Expect(Must(vfs.DirExists(osfs.OsFs, path))).To(BeTrue())
+		Expect(Must(vfs.DirExists(vfs.OSFS, path))).To(BeTrue())
 		Expect(Must(os.ReadDir(path))).To(Equal([]os.DirEntry{}))
 		MustBeSuccessful(temp.Cleanup())
-		Expect(Must(vfs.FileExists(osfs.OsFs, path))).To(BeFalse())
+		Expect(Must(vfs.FileExists(vfs.OSFS, path))).To(BeFalse())
 	})
 
 	Context("with initial content", func() {
