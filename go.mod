@@ -1,6 +1,6 @@
 module github.com/mandelsoft/goutils
 
-go 1.22.5
+go 1.25.0
 
 require (
 	github.com/drone/envsubst v1.0.3
