@@ -19,7 +19,7 @@ func (o *genricoption[S, B, T]) ApplyTo(opts B) {
 // intended for options based on an option setter interface S implemented
 // by the option set B implementing S for the value type T. Hereby, B must
 // implement S, which cannot be expressed by Go generics.
-func WithGenericOption[S, B any, T any](v T) Option[B] {
+func WithGenericOption[S any, B any, T any](v T) Option[B] {
 	var b B
 
 	if _, ok := generics.TryCast[S](b); !ok {
@@ -30,7 +30,7 @@ func WithGenericOption[S, B any, T any](v T) Option[B] {
 
 // WithOptionalGenericOption povides an option if the given pointer
 // is not nil. It then behaves like WithGenericOption for the de-referenced value.
-func WithOptionalGenericOption[S, B any, T any](v *T) Option[B] {
+func WithOptionalGenericOption[S any, B any, T any](v *T) Option[B] {
 	if v != nil {
 		return WithGenericOption[S, B, T](*v)
 	}

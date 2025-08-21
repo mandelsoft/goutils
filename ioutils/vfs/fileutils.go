@@ -67,7 +67,7 @@ func IsFile(_fs fs.StatFS, path string) (bool, error) {
 	return fi.Mode()&os.ModeType == 0, nil
 }
 
-func CopyFile[F1, F2 File](srcfs FileFS[F1], src string, dstfs FileFS[F2], dst string) error {
+func CopyFile[F1 File, F2 File](srcfs FileFS[F1], src string, dstfs FileFS[F2], dst string) error {
 	fi, err := srcfs.Lstat(src)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func CopyFile[F1, F2 File](srcfs FileFS[F1], src string, dstfs FileFS[F2], dst s
 // CopyDir recursively copies a directory tree, attempting to preserve permissions.
 // Source directory must exist, destination directory may exist.
 // Symlinks are ignored and skipped.
-func CopyDir[F1, F2 File](srcfs FileFS[F2], src string, dstfs FileFS[F2], dst string) error {
+func CopyDir[F1 File, F2 File](srcfs FileFS[F2], src string, dstfs FileFS[F2], dst string) error {
 	si, err := srcfs.Stat(src)
 	if err != nil {
 		return err
