@@ -59,3 +59,14 @@ func CompareOrdered[E cmp.Ordered](a, b E) int {
 		return 1
 	}
 }
+
+// ConvertCompareFunc transforms a CompareFunc of one type into a CompareFunc for another type using a type assertion.
+// Basically, N should be a super type of I (which cannot be expressed in Go), or N should be a subtype of I,
+// and all compared objects are also at least of this subtype.
+func ConvertCompareFunc[N, I any](m CompareFunc[I]) CompareFunc[N] {
+	return func(a, b N) int {
+		var ina any = a
+		var inb any = b
+		return m(ina.(I), inb.(I))
+	}
+}

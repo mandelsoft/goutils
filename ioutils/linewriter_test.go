@@ -11,7 +11,7 @@ import (
 	"github.com/mandelsoft/goutils/ioutils"
 )
 
-var _ = FDescribe("Line Writer Test Environment", func() {
+var _ = Describe("Line Writer Test Environment", func() {
 	var buf bytes.Buffer
 	var w io.WriteCloser
 
