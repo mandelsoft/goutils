@@ -175,6 +175,20 @@ var _ = Describe("SliceUtils Test Environment", func() {
 			Expect(sliceutils.HasSuffixFunc(data, equals, 1, 2, 3, 4, 5, 6)).To(BeFalse())
 		})
 	})
+
+	Context("diff", func() {
+		It("calculates diff", func() {
+			a := []int{1, 2, 3, 4, 5}
+			b := []int{2, 3, 5, 6}
+			Expect(sliceutils.Diff(a, b)).To(Equal([]int{1, 4}))
+		})
+
+		It("calculates diff func", func() {
+			a := []int{1, 2, 3, 4, 5}
+			b := []int{2, 3, 5, 6}
+			Expect(sliceutils.DiffFunc(a, b, equals)).To(Equal([]int{1, 4}))
+		})
+	})
 })
 
 func equals(a, b int) bool {
