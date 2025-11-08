@@ -5,22 +5,22 @@ import (
 	"github.com/modern-go/reflect2"
 )
 
-// ArbitraryOption is just generiuc interface to
+// ArbitraryOption is just a generic interface name to
 // indicate the purpose for parameters.
-// because Go does not support parameter overloading,
+// Because Go does not support parameter overloading,
 // different option targets may need to use different apply
-// method names, it an option should be usable for multiple target
+// method names, if an option should be usable for multiple target
 // types. Therefore, a simple generic common Eval method is not possible,
 // because it must call the method with a dedicated name for the intended target.
-// THis package provided some generic implementation being able to
+// This package provides some generic implementation being able to
 // call apply methods based on a given non-standard option interface.
-// This type is used to indicate such type. The concrete type must be an
+// This type is used to indicate such a type. The concrete type must be an
 // option interface type with a single apply method.
 type ArbitraryOption interface {
 }
 
-// EvalArbitraryOptions applies options to a new options object
-// and returns this object.
+// EvalArbitraryOptions applies options to a new options object of type O
+// and returns a pointer to this object.
 // O must be a struct type.
 func EvalArbitraryOptions[I ArbitraryOption, O any](opts ...I) *O {
 	var eff O

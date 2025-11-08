@@ -24,3 +24,14 @@ func ConvertFunc[O, I any](in iter.Seq[I], mapper general.MapperFunc[I, O]) iter
 		})
 	}
 }
+
+func Reverse[T any](in iter.Seq[T]) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		elems := Get(in)
+		for i := range elems {
+			if !yield(elems[len(elems)-i-1]) {
+				return
+			}
+		}
+	}
+}
