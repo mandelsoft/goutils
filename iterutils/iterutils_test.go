@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("Iterutils", func() {
-	Context("Get", func() {
+	Context("Value", func() {
 		It("should return element at index", func() {
 			items := []string{"a", "b", "c"}
 			element := iterutils.Get(iterutils.For(items...))
@@ -16,7 +16,7 @@ var _ = Describe("Iterutils", func() {
 		})
 	})
 
-	Context("For/Get", func() {
+	Context("For/Value", func() {
 		It("should iterate over slice elements", func() {
 			items := []string{"a", "b", "c"}
 			var result []string
@@ -33,6 +33,18 @@ var _ = Describe("Iterutils", func() {
 				count++
 			}
 			Expect(count).To(BeZero())
+		})
+
+		It("should provide slice with super type", func() {
+			items := []any{"a", "b", "c"}
+			result := iterutils.ToSliceOf[string](iterutils.For(items...))
+			Expect(result).To(Equal([]string{"a", "b", "c"}))
+		})
+
+		It("should provide slice ", func() {
+			items := []string{"a", "b", "c"}
+			result := iterutils.Get(iterutils.For(items...))
+			Expect(result).To(Equal([]string{"a", "b", "c"}))
 		})
 	})
 

@@ -25,6 +25,7 @@ var _ = Describe("Test Environment", func() {
 			Expect(general.OptionalNonZero(0, 1)).To(Equal(1))
 			Expect(general.OptionalNonZero(nil, p)).To(BeIdenticalTo(p))
 			Expect(general.OptionalNonZero(1)).To(Equal(1))
+			Expect(general.OptionalNonZero("", "a")).To(Equal("a"))
 			Expect(general.OptionalNonZero(p)).To(BeIdenticalTo(p))
 			Expect(general.OptionalNonZero[int]()).To(Equal(0))
 			Expect(general.OptionalNonZero[*Struct]()).To(BeNil())

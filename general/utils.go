@@ -26,7 +26,7 @@ func Optional[T any](args ...T) T {
 func OptionalNonZero[T any](args ...T) T {
 	var zero T
 	for _, e := range args {
-		if !reflect.DeepEqual(e, zero) {
+		if !reflect.ValueOf(e).IsZero() {
 			return e
 		}
 	}

@@ -41,13 +41,11 @@ func TryCastE[T any](o any) (T, error) {
 //	   x := i.(O)
 //	}
 func Cast[T any](o any) T {
-	var _nil T
 	if o == nil {
+		var _nil T
 		return _nil
 	}
-	var i any = o
-	t := i.(T)
-	return t
+	return any(o).(T)
 }
 
 // CastR cast a result type to a dedicated Type T
