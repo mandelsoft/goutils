@@ -1,7 +1,6 @@
 package funcs
 
 import (
-	"fmt"
 	"github.com/mandelsoft/goutils/general"
 )
 
@@ -59,11 +58,7 @@ func (o none[T]) Error() error {
 // None provides an Option without a value,
 // but optionally with an explicit error.
 func None[T any](err ...error) Option[T] {
-	e := general.Optional(err...)
-	if e == nil {
-		e = fmt.Errorf("no value provided")
-	}
-	return none[T]{err: e}
+	return none[T]{err: general.Optional(err...)}
 }
 
 // AndThen chains an operation on a given Option result,

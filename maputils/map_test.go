@@ -86,7 +86,7 @@ var _ = Describe("MapUtils Test Environment", func() {
 				"bob":   25,
 			}
 
-			Expect(maputils.TransformedKeys(in, TransformKey)).To(Equal([]string{
+			Expect(maputils.OrderedTransformedKeys(in, TransformKey)).To(Equal([]string{
 				"ALICE",
 				"BOB",
 			}))

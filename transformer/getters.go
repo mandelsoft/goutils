@@ -14,6 +14,6 @@ func GetDescription[E interface{ GetDescription() R }, R any](e E) R {
 	return e.GetDescription()
 }
 
-func GetVersionn[E interface{ GetVersion() R }, R any](e E) R {
+func GetVersion[E interface{ GetVersion() R }, R any](e E) R {
 	return e.GetVersion()
 }
