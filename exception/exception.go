@@ -134,7 +134,7 @@ func Exception(r interface{}) error {
 }
 
 func Catch(funcs ...func()) (err error) {
-	PropagateException(&err)
+	defer PropagateException(&err)
 	for _, f := range funcs {
 		f()
 	}
