@@ -128,6 +128,18 @@ func Filter[S ~[]E, E any](in S, f matcher.Matcher[E]) S {
 	return r
 }
 
+// FilterByType filters slice elements implementing type T.
+func FilterByType[T any, S ~[]E, E any](in S) []T {
+	var result []T
+	for _, v := range in {
+		o := any(v)
+		if t, ok := o.(T); ok {
+			result = append(result, t)
+		}
+	}
+	return result
+}
+
 // Transform maps the elements of a slice using
 // a mapping function (m) to elements of type T and returns the resulting
 // slice.

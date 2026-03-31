@@ -6,6 +6,15 @@ import (
 
 type Matcher[E any] func(E) bool
 
+func Type[T any, E any](e E) bool {
+	o := any(e)
+	if o == nil {
+		return false
+	}
+	_, ok := o.(T)
+	return ok
+}
+
 func NotInitial[E comparable](e E) bool {
 	var _ini E
 	return e != _ini

@@ -6,6 +6,10 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+type Other interface {
+	Other()
+}
+
 type Method interface {
 	Method(a, b string) string
 }
@@ -39,4 +43,17 @@ var _ = Describe("Calls Test Environment", func() {
 		reflectutils.CallMethodByInterfaceVA[MethodVA](t, "alice")
 		Expect(t.Result).To(Equal("alice"))
 	})
+
+	It("optionally calls method", func() {
+		t := &Target{}
+		r := reflectutils.CallOptionalInterfaceMethodOn[Method](t, "alice", "bob")
+		Expect(r).To(Equal([]any{"alicebob"}))
+	})
+
+	It("does not call non-supported method", func() {
+		t := &Target{}
+		r := reflectutils.CallOptionalInterfaceMethodOn[Other](t, "alice", "bob")
+		Expect(r).To(BeNil())
+	})
+
 })

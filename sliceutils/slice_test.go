@@ -3,6 +3,7 @@ package sliceutils_test
 import (
 	"strconv"
 
+	"github.com/mandelsoft/goutils/matcher"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -189,8 +190,27 @@ var _ = Describe("SliceUtils Test Environment", func() {
 			Expect(sliceutils.DiffFunc(a, b, equals)).To(Equal([]int{1, 4}))
 		})
 	})
+
+	Context("filter", func() {
+		It("filters by type", func() {
+			slice := []any{1, S(2), 3}
+
+			Expect(sliceutils.Filter(slice, matcher.Type[S])).To(HaveExactElements(S(2)))
+			Expect(sliceutils.Filter(slice, matcher.Not[any](matcher.Type[S]))).To(HaveExactElements(1, 3))
+		})
+	})
 })
 
 func equals(a, b int) bool {
 	return a == b
+}
+
+type I interface {
+	Get() int
+}
+
+type S int
+
+func (s S) Get() int {
+	return int(s)
 }

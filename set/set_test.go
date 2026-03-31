@@ -85,6 +85,13 @@ var _ = Describe("Set Test Environment", func() {
 			}
 			Expect(r).To(ConsistOf("a", "b", "c"))
 		})
+
+		It("contains", func() {
+			s1.Add("a", "b", "c")
+			Expect(s1.Contains("a")).To(BeTrue())
+			Expect(s1.Contains("d")).To(BeFalse())
+			Expect(s1.Contains("a", "b§")).To(BeFalse())
+		})
 	})
 
 	Context("two sets", func() {
