@@ -56,7 +56,8 @@ func GetInterfaceMethodFor[M any](o any) reflect.Value {
 	if o == nil {
 		return reflect.Value{}
 	}
-	if _, ok := any(o).(M); !ok {
+
+	if _, ok := generics.TryCast[M](o); !ok {
 		return reflect.Value{}
 	}
 	return reflect.ValueOf(o).MethodByName(GetInterfaceMethod[M]().Name)
@@ -80,4 +81,15 @@ func CallOptionalInterfaceMethodOnV[M any](o any, args ...interface{}) bool {
 	}
 	m.Call(sliceutils.Transform(args, reflect.ValueOf))
 	return true
+}
+
+// CallOptionalInterfaceMethodOnE is like CallOptionalInterfaceMethodOn
+// but for a method returning an error.
+func CallOptionalInterfaceMethodOnE[M any](o any, args ...interface{}) error {
+	m := GetInterfaceMethodFor[M](o)
+	if !m.IsValid() {
+		return nil
+	}
+	r := m.Call(sliceutils.Transform(args, reflect.ValueOf))
+	return generics.Cast[error](r[0].Interface())
 }

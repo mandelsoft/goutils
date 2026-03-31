@@ -1,6 +1,8 @@
 package reflectutils_test
 
 import (
+	"fmt"
+
 	"github.com/mandelsoft/goutils/reflectutils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,6 +33,18 @@ func (t *Target) MethodVA(a string) {
 	t.Result = a
 }
 
+type MethodE interface {
+	Error() error
+}
+
+type Error struct {
+	err error
+}
+
+func (t *Error) Error() error {
+	return t.err
+}
+
 var _ = Describe("Calls Test Environment", func() {
 	It("calls method based on interface", func() {
 		t := &Target{}
@@ -56,4 +70,13 @@ var _ = Describe("Calls Test Environment", func() {
 		Expect(r).To(BeNil())
 	})
 
+	It("calls error method", func() {
+		t := &Error{fmt.Errorf("error")}
+		e := reflectutils.CallOptionalInterfaceMethodOnE[MethodE](t)
+		Expect(e).To(MatchError("error"))
+
+		t.err = nil
+		e = reflectutils.CallOptionalInterfaceMethodOnE[MethodE](t)
+		Expect(e).To(BeNil())
+	})
 })

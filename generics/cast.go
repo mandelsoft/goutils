@@ -13,8 +13,7 @@ func TryCast[T any](o any) (T, bool) {
 	if o == nil {
 		return _nil, true
 	}
-	var i any = o
-	t, ok := i.(T)
+	t, ok := any(o).(T)
 	return t, ok
 }
 
