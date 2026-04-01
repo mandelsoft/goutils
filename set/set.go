@@ -258,3 +258,7 @@ func KeySet[K comparable, V any](m map[K]V) Set[K] {
 	}
 	return s
 }
+
+func Clone[K comparable, S ~map[K]struct{}](set S) S {
+	return maps.Clone(set)
+}
