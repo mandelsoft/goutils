@@ -21,31 +21,45 @@ func GetInterfaceMethod[M any]() reflect.Method {
 // CallMethodByInterfaceVA calls a void method on object o with
 // one argument a. The method is specified by the interface
 // M, which should implement exactly one appropriate method.
-func CallMethodByInterfaceVA[M, B any](o B, a interface{}) {
-	CallMethodByNameVA[B](GetInterfaceMethod[M]().Name, o, a)
+func CallMethodByInterfaceVA[M any](o any, a interface{}) {
+	CallMethodByNameVA(GetInterfaceMethod[M]().Name, o, a)
 }
 
-func CallMethodByInterfaceV[M, B any](o B, args ...interface{}) {
-	CallMethodByNameV[B](GetInterfaceMethod[M]().Name, o, args...)
+func CallMethodByInterfaceV[M any](o any, args ...interface{}) {
+	CallMethodByNameV(GetInterfaceMethod[M]().Name, o, args...)
 }
 
-func CallMethodByInterface[M, B any](o B, args ...interface{}) []interface{} {
-	return CallMethodByName[B](GetInterfaceMethod[M]().Name, o, args...)
+func CallMethodByInterface[M any](o any, args ...interface{}) []interface{} {
+	return CallMethodByName(GetInterfaceMethod[M]().Name, o, args...)
 }
 
-func CallMethodByNameVA[B any](n string, o B, a interface{}) {
+func CallMethodByNameVA(n string, o any, a interface{}) {
 	reflect.ValueOf(o).MethodByName(n).Call([]reflect.Value{reflect.ValueOf(a)})
 }
 
-func CallMethodByNameV[B any](n string, o B, args ...interface{}) {
+func CallMethodByNameV(n string, o any, args ...interface{}) {
 	v := sliceutils.Transform(args, reflect.ValueOf)
 	reflect.ValueOf(o).MethodByName(n).Call(v)
 }
 
-func CallMethodByName[B any](n string, o B, args ...interface{}) []interface{} {
+func CallMethodByName(n string, o any, args ...interface{}) []interface{} {
 	v := sliceutils.Transform(args, reflect.ValueOf)
 	r := reflect.ValueOf(o).MethodByName(n).Call(v)
 	return sliceutils.Transform(r, MapValueToInterface)
+}
+
+func CallMethodByInterfaceR[M, R any](o any, args ...interface{}) R {
+	r := CallMethodByName(GetInterfaceMethod[M]().Name, o, args...)
+	return generics.Cast[R](r[0])
+}
+
+func CallMethodByInterfaceRE[M, R any](o any, args ...interface{}) (R, error) {
+	r := CallMethodByName(GetInterfaceMethod[M]().Name, o, args...)
+	return generics.Cast[R](r[0]), generics.Cast[error](r[1])
+}
+
+func CallMethodByInterfaceE[M any](o any, args ...interface{}) error {
+	return CallMethodByInterfaceR[M, error](o, args...)
 }
 
 // GetInterfaceMethodFor used an interface with one method to determine
