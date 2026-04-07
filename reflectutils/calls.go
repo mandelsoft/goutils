@@ -77,6 +77,8 @@ func GetInterfaceMethodFor[M any](o any) reflect.Value {
 	return reflect.ValueOf(o).MethodByName(GetInterfaceMethod[M]().Name)
 }
 
+// TODO: check signature for optional variants to avoid panics.
+
 // CallOptionalInterfaceMethodOn calls an interface method on an object if
 // it implements the interface.
 func CallOptionalInterfaceMethodOn[M any](o any, args ...interface{}) []interface{} {
@@ -106,4 +108,16 @@ func CallOptionalInterfaceMethodOnE[M any](o any, args ...interface{}) error {
 	}
 	r := m.Call(sliceutils.Transform(args, reflect.ValueOf))
 	return generics.Cast[error](r[0].Interface())
+}
+
+// CallOptionalInterfaceMethodOnR is like CallOptionalInterfaceMethodOnE
+// but for a method returning a type R.
+func CallOptionalInterfaceMethodOnR[M any, R any](o any, args ...interface{}) R {
+	var _nil R
+	m := GetInterfaceMethodFor[M](o)
+	if !m.IsValid() {
+		return _nil
+	}
+	r := m.Call(sliceutils.Transform(args, reflect.ValueOf))
+	return generics.Cast[R](r[0].Interface())
 }
