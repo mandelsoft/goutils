@@ -1,8 +1,9 @@
 package generics
 
 import (
-	"github.com/mandelsoft/goutils/general"
 	"reflect"
+
+	"github.com/mandelsoft/goutils/general"
 )
 
 type PointerType[P any] interface {
@@ -43,13 +44,26 @@ func Implements[I, O any]() bool {
 	return TypeOf[I]().Implements(TypeOf[O]())
 }
 
+// Initializer can be implemented by a type
+// to get initialized by  ObjectFor.
+type Initializer[O any] interface {
+	New() O
+}
+
+func initialized[O any](o O) O {
+	if i, ok := any(o).(Initializer[O]); ok {
+		return i.New()
+	}
+	return o
+}
+
 // ObjectFor provides an object of type T.
 // If T is a pointer type a pointer to an appropriate object is returned.
 // For a non-pointer type the object is returned as value.
 func ObjectFor[T any]() T {
 	t := TypeOf[T]()
 	if t.Kind() == reflect.Ptr {
-		return reflect.New(t.Elem()).Interface().(T)
+		return initialized(reflect.New(t.Elem()).Interface().(T))
 	}
-	return reflect.New(t).Elem().Interface().(T)
+	return initialized(reflect.New(t).Elem().Interface().(T))
 }

@@ -27,6 +27,27 @@ func (i *IS) Func() {
 
 type MyInt int
 
+type P struct {
+	v string
+}
+
+func (o *P) New() *P {
+	if o == nil {
+		return &P{"initial"}
+	}
+	o.v = "set"
+	return o
+}
+
+type V struct {
+	v string
+}
+
+func (o V) New() V {
+	o.v = "set"
+	return o
+}
+
 var _ = Describe("types", func() {
 	Context("implements", func() {
 		It("implements", func() {
@@ -55,6 +76,14 @@ var _ = Describe("types", func() {
 		})
 		It("non-pointer", func() {
 			Expect(generics.ObjectFor[NS]()).To(Equal(NS{}))
+		})
+
+		It("pointer iniialized", func() {
+			Expect(generics.ObjectFor[*P]()).To(Equal(&P{"set"}))
+		})
+
+		It("non-pointer iniialized", func() {
+			Expect(generics.ObjectFor[V]()).To(Equal(V{"set"}))
 		})
 	})
 })
