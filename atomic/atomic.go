@@ -6,6 +6,9 @@ import (
 	"github.com/mandelsoft/goutils/generics"
 )
 
+// Value can hold a value or pointer type.
+// If used for an interface type nil is not a possible value.
+// If an interface (including nil) is required, user InterfaceValue.
 type Value[T any] struct {
 	atomic.Value
 }

@@ -10,22 +10,47 @@ type S struct {
 	value string
 }
 
+func (s *S) String() string {
+	return s.value
+}
+
+var _ I = (*S)(nil)
+
+type O struct {
+	S
+}
+
+type I interface {
+	String() string
+}
+
 var _ = Describe("Atomic Test Environment", func() {
-	Context("nilable", func() {
+	Context("interface", func() {
+		var a atomic.InterfaceValue[I]
+
+		BeforeEach(func() {
+			a = atomic.InterfaceValue[I]{}
+		})
+
 		It("initial", func() {
-			var a atomic.Value[*S]
 			Expect(a.Load()).To(BeNil())
 		})
+
+		It("set nil", func() {
+			a.Store(&S{"alice"})
+			Expect(a.Load().String()).To(Equal("alice"))
+			a.Store(nil)
+			Expect(a.Load()).To(BeNil())
+			Expect(a.Load() == nil).To(BeTrue())
+			Expect(a.Load() == nil).To(BeTrue())
+		})
 		It("set/get", func() {
-			var a atomic.Value[*S]
 			v := &S{"alice"}
 			a.Store(v)
 			Expect(a.Load()).To(BeIdenticalTo(v))
 		})
 
 		It("swap", func() {
-			var a atomic.Value[*S]
-
 			v := &S{"alice"}
 			Expect(a.Swap(v)).To(BeNil())
 			Expect(a.Swap(nil)).To(BeIdenticalTo(v))
@@ -35,8 +60,57 @@ var _ = Describe("Atomic Test Environment", func() {
 		})
 
 		It("compareandswap", func() {
-			var a atomic.Value[*S]
+			v := &S{"alice"}
+			Expect(a.CompareAndSwap(v, nil)).To(BeFalse())
+			Expect(a.Load()).To(BeNil())
+			Expect(a.CompareAndSwap(nil, v)).To(BeTrue())
+			Expect(a.Load()).To(BeIdenticalTo(v))
+			Expect(a.CompareAndSwap(nil, nil)).To(BeFalse())
+			Expect(a.CompareAndSwap(v, nil)).To(BeTrue())
+			Expect(a.Load()).To(BeNil())
+			Expect(a.CompareAndSwap(nil, v)).To(BeTrue())
+			Expect(a.Load()).To(BeIdenticalTo(v))
+		})
 
+	})
+
+	Context("pointer", func() {
+		var a atomic.Value[*S]
+
+		BeforeEach(func() {
+			a = atomic.Value[*S]{}
+		})
+
+		It("initial", func() {
+			Expect(a.Load()).To(BeNil())
+		})
+		It("set initial nil", func() {
+			a.Store(nil)
+			Expect(a.Load()).To(BeNil())
+			Expect(a.Load() == nil).To(BeTrue())
+		})
+		It("set nil", func() {
+			a.Store(&S{})
+			a.Store(nil)
+			Expect(a.Load()).To(BeNil())
+			Expect(a.Load() == nil).To(BeTrue())
+		})
+		It("set/get", func() {
+			v := &S{"alice"}
+			a.Store(v)
+			Expect(a.Load()).To(BeIdenticalTo(v))
+		})
+
+		It("swap", func() {
+			v := &S{"alice"}
+			Expect(a.Swap(v)).To(BeNil())
+			Expect(a.Swap(nil)).To(BeIdenticalTo(v))
+			Expect(a.Load()).To(BeNil())
+			Expect(a.Swap(v)).To(BeNil())
+			Expect(a.Load()).To(BeIdenticalTo(v))
+		})
+
+		It("compareandswap", func() {
 			v := &S{"alice"}
 			Expect(a.CompareAndSwap(v, nil)).To(BeFalse())
 			Expect(a.Load()).To(BeNil())
@@ -52,32 +126,29 @@ var _ = Describe("Atomic Test Environment", func() {
 	})
 
 	Context("not nilable", func() {
+		var a atomic.Value[int]
+
+		BeforeEach(func() {
+			a = atomic.Value[int]{}
+		})
+
 		It("initial", func() {
-			var a atomic.Value[int]
 			Expect(a.Load()).To(Equal(0))
 		})
 
 		It("set/get", func() {
-			var a atomic.Value[int]
 			v := 5
 			a.Store(v)
 			Expect(a.Load()).To(BeIdenticalTo(v))
 		})
 
 		It("swap", func() {
-			var a atomic.Value[*S]
-
-			v := &S{"alice"}
-			Expect(a.Swap(v)).To(BeNil())
-			Expect(a.Swap(nil)).To(BeIdenticalTo(v))
-			Expect(a.Load()).To(BeNil())
-			Expect(a.Swap(v)).To(BeNil())
-			Expect(a.Load()).To(BeIdenticalTo(v))
+			Expect(a.Swap(1)).To(Equal(0))
+			Expect(a.Swap(2)).To(BeIdenticalTo(1))
+			Expect(a.Load()).To(BeIdenticalTo(2))
 		})
 
 		It("compareandswap", func() {
-			var a atomic.Value[int]
-
 			v := 5
 			Expect(a.CompareAndSwap(v, 0)).To(BeFalse())
 			Expect(a.Load()).To(Equal(0))
@@ -90,5 +161,4 @@ var _ = Describe("Atomic Test Environment", func() {
 			Expect(a.Load()).To(BeIdenticalTo(v))
 		})
 	})
-
 })
